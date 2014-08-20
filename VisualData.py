@@ -12,7 +12,7 @@ class VisualizeData:
         self.data_size = n  # number of indexes
         self.activity_data = type_data  # key-type, value - list of hours spent in sorted order of date.
         self.x_indices = x_indices  # List of dates
-        self.width = 0.35
+        self.width = 1
         self.colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
     def validate_data(self):
@@ -24,15 +24,28 @@ class VisualizeData:
         self.validate_data()
 
         bars = []
-
-        i = 0
+        colors_used = []
+        bottom_y_coordinate = [0]*len(self.x_indices)
+        color_count = 0
         for activity_type in self.activity_data.keys():
-            bars.append(plot.bar(np.arange(len(self.x_indices)), self.activity_data[activity_type], width=self.width, color=self.colors[i]))
-            i += 1
-            print self.colors[i]
+            bars.append(plot.bar(np.arange(len(self.x_indices)),
+                                 self.activity_data[activity_type],
+                                 width=self.width,
+                                 color=self.colors[color_count],
+                                 bottom=bottom_y_coordinate))
 
-        # plot.xticks(self.x_indices+self.width/.2, self.x_indices)
-        # plot.xticks(self.x_indices+self.width/.2, range(len(self.x_indices)))
+            # Increase the bottom by the height of each current type bar
+            for i in range(len(self.activity_data[activity_type])):
+                bottom_y_coordinate[i] += self.activity_data[activity_type][i]
+
+            colors_used.append(self.colors[color_count])
+            print activity_type, " = ", self.colors[color_count]
+            color_count += 1
+
+
+        plot.xticks(np.arange(len(self.x_indices))+self.width/2., self.x_indices, rotation='vertical')
+        plot.subplots_adjust(bottom=0.25)
+        plot.legend((x[0] for x in bars), self.activity_data.keys())
 
         plot.yticks(np.arange(0, 10, 1))
         # plot.show()
@@ -50,8 +63,9 @@ def main():
 
     parse_zone_data = ParseZoneData(filename)
     parse_zone_data.parse_file()
-    parse_zone_data.print_parsed_data()
     parse_zone_data.generate_visual_data()
+    parse_zone_data.print_parsed_data()
+
 
     visualize_data = VisualizeData(n=len(parse_zone_data.visualize_data_dates),
                                    type_data=parse_zone_data.visualize_data_typewise_hours,

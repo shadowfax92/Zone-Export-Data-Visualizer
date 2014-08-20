@@ -69,10 +69,13 @@ class ParseZoneData:
                 else:
                     self.visualize_data_typewise_hours[type_key].append(float(self.input_data[date_key][type_key]))  # else append actual hours spent
 
-
     def print_parsed_data(self):
         for key in sorted(self.input_data.keys()):
             print key + " : " + str(self.input_data[key])
+
+        print 'Visual data'
+        print self.visualize_data_dates
+        print self.visualize_data_typewise_hours
 
 
 #Testing
@@ -87,8 +90,6 @@ def main():
     parse_zone_data.parse_file()
     parse_zone_data.generate_visual_data()
     parse_zone_data.print_parsed_data()
-    print parse_zone_data.visualize_data_typewise_hours
-    print parse_zone_data.visualize_data_dates
 
 
 if __name__ == '__main__':
