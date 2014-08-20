@@ -44,7 +44,7 @@ class VisualizeData:
 
 
         plot.xticks(np.arange(len(self.x_indices))+self.width/2., self.x_indices, rotation='vertical')
-        plot.subplots_adjust(bottom=0.25)
+        plot.subplots_adjust(bottom=.5)
         plot.legend((x[0] for x in bars), self.activity_data.keys())
 
         plot.yticks(np.arange(0, 10, 1))
