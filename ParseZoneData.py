@@ -9,8 +9,12 @@ import datetime
 class ParseZoneData:
     def __init__(self, filename):
         self.filename = filename
-        self.dict = dict()  # key - date, value - Dictionary keyed by type
+        self.input_data = dict()  # key - date, value - Dictionary keyed by type
         # Sample - 2014-07-20 : {'break': '1.88', 'Home-planned': '3.58'}
+        self.all_types_present = []
+
+        self.visualize_data_typewise_hours = dict()  # key-type, value - list of hours spent in sorted order of date.
+        self.visualize_data_dates = list()
 
         #validations
         if not os.path.isfile(self.filename):
@@ -28,12 +32,15 @@ class ParseZoneData:
 
                 if self.validate_date(date):
                     #store in dictionary
-                    if date in self.dict:
-                        tmp_dict = self.dict[date]
+                    if date in self.input_data:
+                        tmp_dict = self.input_data[date]
                     else:
                         tmp_dict = dict()
                     tmp_dict[activity_type] = hours
-                    self.dict[date] = tmp_dict
+                    self.input_data[date] = tmp_dict
+
+                    if activity_type not in self.all_types_present:
+                        self.all_types_present.append(activity_type)
 
             except Exception, e:
                 print 'Exception: ' + str(e)
@@ -46,9 +53,26 @@ class ParseZoneData:
         except ValueError:
             return False
 
+    def generate_visual_data(self):
+        # Generate the date list. Should store dates in sorted order
+        for date in sorted(self.input_data.keys()):
+            self.visualize_data_dates.append(date)
+
+        # Generates a Dictionary with each element of a particular type storing the hours spent on that date
+        for date_key in sorted(self.input_data.keys()):
+            for type_key in self.all_types_present:
+                if type_key not in self.visualize_data_typewise_hours:
+                    self.visualize_data_typewise_hours[type_key] = list()
+
+                if type_key not in self.input_data[date_key]:
+                    self.visualize_data_typewise_hours[type_key].append(float(0))  # just append 0hrs for that day
+                else:
+                    self.visualize_data_typewise_hours[type_key].append(float(self.input_data[date_key][type_key]))  # else append actual hours spent
+
+
     def print_parsed_data(self):
-        for key in sorted(self.dict.keys()):
-            print key + " : " + str(self.dict[key])
+        for key in sorted(self.input_data.keys()):
+            print key + " : " + str(self.input_data[key])
 
 
 #Testing
@@ -61,7 +85,11 @@ def main():
 
     parse_zone_data = ParseZoneData(filename)
     parse_zone_data.parse_file()
+    parse_zone_data.generate_visual_data()
     parse_zone_data.print_parsed_data()
+    print parse_zone_data.visualize_data_typewise_hours
+    print parse_zone_data.visualize_data_dates
+
 
 if __name__ == '__main__':
     main()
