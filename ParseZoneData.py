@@ -55,7 +55,15 @@ class ParseZoneData:
 
     def get_day_of_week(self, date_text):
         try:
-            date_string = datetime.datetime.strptime(date_text, '%Y-%m-%d').strftime('%A')
+            date_string = datetime.datetime.strptime(date_text, '%Y-%m-%d').strftime('%a')
+        except:
+            date_string = "None"
+        finally:
+            return date_string
+
+    def get_simplified_date(self, date_text):
+        try:
+            date_string = datetime.datetime.strptime(date_text, '%Y-%m-%d').strftime('%d-%h (%a)')
         except:
             date_string = "None"
         finally:
@@ -65,7 +73,8 @@ class ParseZoneData:
     def generate_visual_data(self):
         # Generate the date list. Should store dates in sorted order
         for date in sorted(self.input_data.keys()):
-            self.visualize_data_dates.append(" (" + date + ") " + self.get_day_of_week(date))
+            # self.visualize_data_dates.append(" (" + date + ") " + self.get_day_of_week(date))
+            self.visualize_data_dates.append(self.get_simplified_date(date))
 
         # Generates a Dictionary with each element of a particular type storing the hours spent on that date
         for date_key in sorted(self.input_data.keys()):
